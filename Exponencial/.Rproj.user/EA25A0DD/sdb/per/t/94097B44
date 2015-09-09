@@ -1,0 +1,16 @@
+{
+    "contents" : "\n# This is the user-interface definition of a Shiny web application.\n# You can find out more about building applications with Shiny here:\n#\n# http://shiny.rstudio.com\n#\n\nlibrary(shiny)\n\nshinyUI(fluidPage(\n\n  # Application title\n  titlePanel(\"Simulacion de Exponenciales\"),\n\n  # Sidebar with a slider input for number of bins\n  sidebarLayout(\n    sidebarPanel(\n      sliderInput(\"lambda\",\n                  \"Lambda\",\n                  min = 1,\n                  max = 50,\n                  value = 10),\n      numericInput(\"nsim\",\n                  \"Values\",\n                  min = 1,\n                  max = 100000,\n                  value = 100),\n      tableOutput(\"table\")\n    ),\n\n    # Show a plot of the generated distribution\n    mainPanel(\n      plotOutput(\"distPlot\")\n    )\n    \n  )\n))\n",
+    "created" : 1439691633015.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4177391086",
+    "id" : "94097B44",
+    "lastKnownWriteTime" : 1439695117,
+    "path" : "~/Dropbox/batmelon/Estadística Computacional/Exponencial/ui.R",
+    "project_path" : "ui.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
