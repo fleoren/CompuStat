@@ -8,24 +8,48 @@
 library(shiny)
 
 shinyUI(fluidPage(
-
+  
   # Application title
-  titlePanel("Déjanos Adivinar Cuántos Clusters Tienen tus Datos"),
-
+  titlePanel("Dejanos Adivinar Cuantos Clusters Tienen tus Datos"),
+  
   # Sidebar... here would go the "choose file" button"
   sidebarLayout(
     sidebarPanel(
-      #sliderInput("bins",
-       #           "Number of bins:",
-       #           min = 1,
-      #            max = 50,
-        #          value = 30)
+      fileInput('file1', 'Elige un archivo',
+                accept = c(
+                  'text/csv',
+                  'text/comma-separated-values',
+                  'text/tab-separated-values',
+                  'text/plain',
+                  '.csv',
+                  '.tsv'
+                )
+      ),
+      tags$hr(),
+      checkboxInput('header', 'Tiene encabezado', TRUE),
+      radioButtons('sep', 'Separator',
+                   c(Comma=',',
+                     Semicolon=';',
+                     Tab='\t'),
+                   ','),
+      radioButtons('quote', 'Encomillado',
+                   c(None='',
+                     'Doble'='"',
+                     'Simple'="'"),
+                   '"')
+      # otra
     ),
-
-    # Show a plot of the generated clusters
-    tabsetPanel(
-      tabPanel("Clusters",plotOutput("clustPlot"))
-      #tabPanel("Algunas Gráficas de Apoyo",plotOutput("bla"))
+    
+    mainPanel(
+      tabsetPanel(
+        tabPanel("Clusters",plotOutput("clustPlot"))
+      )
     )
+    
+    # Show a plot of the generated clusters
+    #tabsetPanel(
+    #  tabPanel("Clusters",plotOutput("clustPlot"))
+    #tabPanel("Algunas Graficas de Apoyo",plotOutput("bla"))
+    #)
   )
 ))
