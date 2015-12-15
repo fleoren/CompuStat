@@ -36,8 +36,10 @@ shinyUI(fluidPage(
                    c(None='',
                      'Doble'='"',
                      'Simple'="'"),
-                   '"')
+                   '"'),
       # otra
+      
+      sliderInput('angle', 'Angulo del grafico', 0, 360, value=45)
     ),
     
     mainPanel(
