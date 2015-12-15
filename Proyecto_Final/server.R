@@ -51,8 +51,9 @@ shinyServer(function(input, output) {
     
     colors <- sample(rainbow(201), size=mixclust$G, replace = FALSE)
     colors <- colors[as.numeric(mix_df$V1)] #random colors...
+    
     scatterplot3d(mix_df[1:3], pch = 16, color=colors,main="Clusters Encontrados",
-                  col.axis="grey") #yay plot
+                  col.axis="grey", angle=input$angle) #yay plot
 
   })
 
