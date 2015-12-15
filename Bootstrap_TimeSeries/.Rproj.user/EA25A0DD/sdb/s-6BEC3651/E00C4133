@@ -1,0 +1,16 @@
+{
+    "contents" : "\n# This is the user-interface definition of a Shiny web application.\n# You can find out more about building applications with Shiny here:\n#\n# http://shiny.rstudio.com\n#\n\nlibrary(shiny)\n#install.packages(\"tseries\")\nlibrary(tseries)\n\nshinyUI(fluidPage(\n\n  # Application title\n  titlePanel(\"Bootstrapping for the parameter alpha of an AR(1) process\"),\n\n  # Sidebar with a slider input for number of bins\n  sidebarLayout(\n    sidebarPanel(\n      numericInput(\"a\",\n                  \"Alpha:\",\n                  min = -1,\n                  max = 1,\n                  value = 0.5),\n      sliderInput(\"n\",\n                  \"Points for time series\",\n                  min = 1,\n                  max = 5000,\n                  value = 500),\n      sliderInput(\"nb\",\n                  \"Bootstrap samples:\",\n                  min = 1,\n                  max = 25000,\n                  value = 5000)\n    ),\n\n    # Show a plot of the generated distribution\n    mainPanel(\n      tabsetPanel(\n        tabPanel(\"Time Series Plot\",plotOutput(\"TSPlot\")),\n        tabPanel(\"Bootstrap for Alpha\",plotOutput(\"BSPlot\"))\n      )\n    )\n  )\n))\n",
+    "created" : 1445447030874.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1113488670",
+    "id" : "E00C4133",
+    "lastKnownWriteTime" : 1445467939,
+    "path" : "~/Dropbox/batmelon/Estadística Computacional/CompuStat/Bootstrap_TimeSeries/ui.R",
+    "project_path" : "ui.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

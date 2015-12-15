@@ -1,0 +1,16 @@
+{
+    "contents" : "\n# This is the server logic for a Shiny web application.\n# You can find out more about building applications with Shiny here:\n#\n# http://shiny.rstudio.com\n#\n\nlibrary(shiny)\n\n    #create an AR(1) process with specified parameters\n    create_time_series<-function(alpha,n){\n      x <- double(n+100)\n      e <- rnorm(n+100) \n      x[1] <- rnorm(1)\n      for(i in 2:(n+100)) {\n        x[i] <- alpha * x[i-1] + e[i]\n      }\n      x <- ts(x[-(1:100)])\n    }\n    \n    #the function of interest to bootstrap\n    acflag1 <- function(x)\n    {\n      xo <- c(x[,1], x[1,2])\n      xm <- mean(xo)\n      return(mean((x[,1]-xm)*(x[,2]-xm))/mean((xo-xm)^2))\n    }\n\nshinyServer(function(input, output) {\n\n#reactive\n  xx <- reactive(create_time_series(alpha=input$a,n=input$n))\n  output$TSPlot <- renderPlot({\n    # Generate AR(1) process\n    x <- xx()\n   # draw the time series\n    plot(x,main=\"Serie de tiempo generada\",xlab=\"tiempo\")\n  })\n  \n  output$BSPlot <- renderPlot({\n    x <- xx()\n    #estimate alpha with R package\n    alpha_estimate<-ar(x, aic = FALSE, order.max = 1)\n    alpha_est<-alpha_estimate$ar\n    #the actual process of bootstrapping\n    boot<-tsbootstrap(x, nb=input$nb, statistic=acflag1, m=2)\n    #plot\n    plot(density(boot$statistic),main=\"Densidad de alpha - Bootstrapped\",\n         xlab=\"alpha\",ylab='densidad',col=\"blue\")\n    lines(density(boot$statistic, adjust=1.5), lty=\"dotted\", col=\"darkgreen\", lwd=2) \n    abline(v=input$a,col=\"red\")\n    abline(v=alpha_est,col=\"grey\")\n    dens<-density(boot$statistic)\n    #coordenates to put the legend - only to assure it fits\n    coor_x<-max(boot$statistic)-0.07\n    coor_y<-max(dens$y)-mean(dens$y)\n    legend(coor_x,coor_y,c(\"Densidad Boostrap\",\"Dens. BStrap Suavizada\",\"Valor Real\",\"Valor Estimado por R\"),\n           lwd=2,col=c(\"blue\",\"darkgreen\",\"red\",\"grey\"),cex = .65)\n  })\n\n})\n",
+    "created" : 1445447031108.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2157023445",
+    "id" : "5482854A",
+    "lastKnownWriteTime" : 1445468105,
+    "path" : "~/Dropbox/batmelon/Estadística Computacional/CompuStat/Bootstrap_TimeSeries/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

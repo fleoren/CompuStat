@@ -1,0 +1,16 @@
+{
+    "contents" : "\n# This is the server logic for a Shiny web application.\n# You can find out more about building applications with Shiny here:\n#\n# http://shiny.rstudio.com\n#\n\nlibrary(shiny)\n#install.packages('mclust')\nlibrary(mclust)      \n#install.packages(\"devtools\")\nlibrary(\"devtools\")\n#install_github(repo = \"bryanhanson/ChemoSpec@master\")\nlibrary(\"ChemoSpec\")\n#install.packages(\"car\")\nlibrary(car)\n#install.packages(\"scatterplot3d\")\nlibrary(\"scatterplot3d\")\n\nshinyServer(function(input, output) {\n  \n  x1 = rnorm(n=20, mean=1, sd=1)   # get 20 normal distributed points for x axis with mean=1 and std=1 (1st class)\n  y1 = rnorm(n=20, mean=1, sd=1)   # get 20 normal distributed points for x axis with mean=1 and std=1 (1st class)\n  z1 = rnorm(n=20, mean=1, sd=1)   # get 20 normal distributed points for x axis with mean=1 and std=1 (1st class)\n  x2 = rnorm(n=20, mean=5, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)\n  y2 = rnorm(n=20, mean=5, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)\n  z2 = rnorm(n=20, mean=5, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)\n  x3 = rnorm(n=20, mean=-2, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)\n  y3 = rnorm(n=20, mean=-2, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)\n  z3 = rnorm(n=20, mean=-2, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)\n  mix = matrix(nrow=60, ncol=3)    # create a dataframe matrix \n  mix[,1] = c(x1, x2, x3)              # insert first class points into the matrix\n  mix[,2] = c(y1, y2, y3)              # insert second class points into the matrix\n  mix[,3] = c(z1, z2 ,z3)              # insert third class points into the matrix\n\n  output$clustPlot <- renderPlot({\n\n    # generate bins based on input$bins from ui.R\n    mixclust = Mclust(mix)           # initialize EM with hierarchical clustering, execute BIC and EM\n    #add classification as a variable, then use as data frame for easy plotting\n    mix<-cbind(mixclust$classification,mix)\n    mix_df<-as.data.frame(mix)\n    \n    colors <- sample(rainbow(201), size=mixclust$G, replace = FALSE)\n    colors <- colors[as.numeric(mix_df$V1)] #random colors...\n    scatterplot3d(mix_df[1:3], pch = 16, color=colors,main=\"Clusters Encontrados\",\n                  col.axis=\"grey\") #yay plot\n\n  })\n\n})\n",
+    "created" : 1450205232234.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1413215364",
+    "id" : "337D252D",
+    "lastKnownWriteTime" : 1450205597,
+    "path" : "~/Dropbox/batmelon/Estadística Computacional/Proyecto_Final/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
