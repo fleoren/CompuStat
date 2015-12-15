@@ -1,13 +1,13 @@
 {
-    "contents" : "\n# This is the user-interface definition of a Shiny web application.\n# You can find out more about building applications with Shiny here:\n#\n# http://shiny.rstudio.com\n#\n\nlibrary(shiny)\n\nshinyUI(fluidPage(\n\n  # Application title\n  titlePanel(\"Déjanos Adivinar Cuántos Clusters Tienen tus Datos\"),\n\n  # Sidebar... here would go the \"choose file\" button\"\n  sidebarLayout(\n    sidebarPanel(\n      #sliderInput(\"bins\",\n       #           \"Number of bins:\",\n       #           min = 1,\n      #            max = 50,\n        #          value = 30)\n    ),\n\n    # Show a plot of the generated clusters\n    tabsetPanel(\n      tabPanel(\"Clusters\",plotOutput(\"clustPlot\"))\n      #tabPanel(\"Algunas Gráficas de Apoyo\",plotOutput(\"bla\"))\n    )\n  )\n))\n",
+    "contents" : "\n# This is the user-interface definition of a Shiny web application.\n# You can find out more about building applications with Shiny here:\n#\n# http://shiny.rstudio.com\n#\n\nlibrary(shiny)\n\nshinyUI(fluidPage(\n  \n  # Application title\n  titlePanel(\"Dejanos Adivinar Cuantos Clusters Tienen tus Datos\"),\n  \n  # Sidebar... here would go the \"choose file\" button\"\n  sidebarLayout(\n    sidebarPanel(\n      fileInput('file1', 'Elige un archivo',\n                accept = c(\n                  'text/csv',\n                  'text/comma-separated-values',\n                  'text/tab-separated-values',\n                  'text/plain',\n                  '.csv',\n                  '.tsv'\n                )\n      ),\n      tags$hr(),\n      checkboxInput('header', 'Tiene encabezado', TRUE),\n      radioButtons('sep', 'Separator',\n                   c(Comma=',',\n                     Semicolon=';',\n                     Tab='\\t'),\n                   ','),\n      radioButtons('quote', 'Encomillado',\n                   c(None='',\n                     'Doble'='\"',\n                     'Simple'=\"'\"),\n                   '\"')\n      # otra\n    ),\n    \n    mainPanel(\n      tabsetPanel(\n        tabPanel(\"Clusters\",plotOutput(\"clustPlot\"))\n      )\n    )\n    \n    # Show a plot of the generated clusters\n    #tabsetPanel(\n    #  tabPanel(\"Clusters\",plotOutput(\"clustPlot\"))\n    #tabPanel(\"Algunas Graficas de Apoyo\",plotOutput(\"bla\"))\n    #)\n  )\n))",
     "created" : 1450205231666.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "4134327169",
+    "hash" : "2276598390",
     "id" : "B3396A73",
-    "lastKnownWriteTime" : 1450206493,
-    "path" : "~/Dropbox/batmelon/Estadística Computacional/Proyecto_Final/ui.R",
+    "lastKnownWriteTime" : 1450210779,
+    "path" : "~/Dropbox/batmelon/Estadística Computacional/CompuStat/CompuStat/Proyecto_Final/ui.R",
     "project_path" : "ui.R",
     "properties" : {
     },
