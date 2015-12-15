@@ -35,6 +35,14 @@ shinyServer(function(input, output) {
 
   output$clustPlot <- renderPlot({
 
+    inFile <- input$file1
+    
+    if (is.null(inFile))
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    
+    datos <- read.csv(inFile$datapath, header = input$header,
+                      sep = input$sep, quote = input$quote)
+    
     # generate bins based on input$bins from ui.R
     mixclust = Mclust(mix)           # initialize EM with hierarchical clustering, execute BIC and EM
     #add classification as a variable, then use as data frame for easy plotting
