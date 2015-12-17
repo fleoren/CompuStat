@@ -18,22 +18,7 @@ library(car)
 library("scatterplot3d")
 
 shinyServer(function(input, output) {
-  
-  #TODO ESTO DEBE SER BORRADO CUANDO FUNCIONE UPLOADFILE
-  #x1 = rnorm(n=20, mean=1, sd=1)   # get 20 normal distributed points for x axis with mean=1 and std=1 (1st class)
-  #y1 = rnorm(n=20, mean=1, sd=1)   # get 20 normal distributed points for x axis with mean=1 and std=1 (1st class)
-  #z1 = rnorm(n=20, mean=1, sd=1)   # get 20 normal distributed points for x axis with mean=1 and std=1 (1st class)
-  #x2 = rnorm(n=20, mean=5, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)
-  #y2 = rnorm(n=20, mean=5, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)
-  #z2 = rnorm(n=20, mean=5, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)
-  #x3 = rnorm(n=20, mean=-2, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)
-  #y3 = rnorm(n=20, mean=-2, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)
-  #z3 = rnorm(n=20, mean=-2, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)
-  #mix = matrix(nrow=60, ncol=3)    # create a dataframe matrix 
-  #mix[,1] = c(x1, x2, x3)              # insert first class points into the matrix
-  #mix[,2] = c(y1, y2, y3)              # insert second class points into the matrix
-  #mix[,3] = c(z1, z2 ,z3)              # insert third class points into the matrix
-  
+
   filedata <- reactive({
     inFile <- input$file1
     if (is.null(inFile)) {
@@ -70,6 +55,9 @@ shinyServer(function(input, output) {
                   col.axis="grey", angle=input$angle,
                   type="h", lty.hplot=2) #yay plot
     
+    scatterplot3d(x=mix_df[1:3], 
+                  pch = 16, color=colors,main="Clusters Encontrados",
+                  col.axis="grey", angle=input$angle) #yay plot
   })
   
   output$density <- renderPlot({
