@@ -51,7 +51,7 @@ shinyServer(function(input, output) {
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
-    mix<-as.matrix(filedata())
+    mix<-as.matrix(filedata()[input$columnas])
     # generate the clustering model
     mixclust = Mclust(mix)           # initialize EM with hierarchical clustering, execute BIC and EM
     #add classification as a variable, then use as data frame for easy plotting
@@ -70,19 +70,6 @@ shinyServer(function(input, output) {
                   col.axis="grey", angle=input$angle,
                   type="h", lty.hplot=2) #yay plot
     
-    # Add supplementary points
-    
-    for (i in 1:max(mixclust$G)){
-      tmp<-mixclust$classification==i  
-      #lines(density(mix_df$data[tmp],adjust=2),col=ColourVec[i])
-      #s3d$points3d(mixclust$data[,1], density(mixclust$data[,1],adjust=2),
-      #             col = b[i], type = "l", pch = 8)
-      
-      #s3d$plane3d(density(mix_df$data[tmp],adjust=2), col = b[i], pch = 8,
-      #            type="h", lty.hplot=2)
-      
-    }
-    
   })
   
   output$density <- renderPlot({
@@ -92,23 +79,29 @@ shinyServer(function(input, output) {
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
-    mix<-as.matrix(filedata())
-    # generate the clustering model
-    mixclust = Mclust(mix)           # initialize EM with hierarchical clustering, execute BIC and EM
-    #add classification as a variable, then use as data frame for easy plotting
-    mix<-cbind(mix,mixclust$classification)
-    colnames(mix)[length(colnames(mix))] <- "class"
-    mix_df<-as.data.frame(mix)
+    mix<-filedata()[input$columnas]
     
-    #partir colors en K (num clusters)
+    dens = densityMclust(mix)
+    
     a <- rainbow(201)
-    b <- a[seq(1, length(a), 201/mixclust$G)]
-    #colors <- sample(rainbow(201), size=mixclust$G, replace = FALSE) this made it random
-    colors <- b[as.numeric(mix_df$class)] #for coloring clusters
+    b <- a[seq(1, length(a), 201/dens$G)]
     
-    dens = densityMclust(mixclust$data)
+    #plot(dens, what = "density", type = "persp", col = mixclust$classification)
+    plot(dens, what = "density", data = mix, col=b)
+  })
+  
+  output$classification <- renderPlot({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      print(input$columnas)
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
     
-    plot(dens, what = "density", type = "persp", col = mixclust$classification)
+    mix<-filedata()[input$columnas]
+    
+    mixclust = Mclust(mix)
+    
+    plot(mixclust, what = "classification")
   })
   
   output$selectMultiple <- renderUI({
@@ -118,7 +111,7 @@ shinyServer(function(input, output) {
     data <- as.matrix(filedata())
     selectizeInput('columnas', 'Que columnas quieres visualizar', 
                    choices = colnames(data), multiple = TRUE,
-                   options = list(maxItems = 2))
+                   options = list(maxItems = 3))
   })
   
 })
