@@ -70,6 +70,13 @@ shinyServer(function(input, output) {
                   col.axis="grey", angle=input$angle,
                   type="h", lty.hplot=2) #yay plot
     
+<<<<<<< Updated upstream
+=======
+    scatterplot3d(x=mix_df[1:3], 
+                  pch = 16, color=colors,main="Clusters Encontrados",
+                  col.axis="grey", angle=input$angle) #yay plot
+
+>>>>>>> Stashed changes
   })
   
   output$density <- renderPlot({
