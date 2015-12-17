@@ -33,33 +33,92 @@ shinyServer(function(input, output) {
   #mix[,1] = c(x1, x2, x3)              # insert first class points into the matrix
   #mix[,2] = c(y1, y2, y3)              # insert second class points into the matrix
   #mix[,3] = c(z1, z2 ,z3)              # insert third class points into the matrix
-
-  output$clustPlot <- renderPlot({
-
+  
+  filedata <- reactive({
     inFile <- input$file1
-    
-    if (is.null(inFile))
+    if (is.null(inFile)) {
+      # User has not uploaded a file yet
+      return(NULL)
+    }
+    read.csv(inFile$datapath, header = input$header,
+             sep = input$sep, quote = input$quote)
+  })
+  
+  output$clustPlot <- renderPlot({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      print(input$columnas)
       return(NULL) # si no han seleccionado archivo no hacer nada
+    }
     
-    datos <- read.csv(inFile$datapath, header = input$header,
-                      sep = input$sep, quote = input$quote)
-    
-    mix<-as.matrix(datos)
+    mix<-as.matrix(filedata())
     # generate the clustering model
     mixclust = Mclust(mix)           # initialize EM with hierarchical clustering, execute BIC and EM
     #add classification as a variable, then use as data frame for easy plotting
-    mix<-cbind(mixclust$classification,mix)
+    mix<-cbind(mix,mixclust$classification)
+    colnames(mix)[length(colnames(mix))] <- "class"
     mix_df<-as.data.frame(mix)
     
     #partir colors en K (num clusters)
     a <- rainbow(201)
     b <- a[seq(1, length(a), 201/mixclust$G)]
     #colors <- sample(rainbow(201), size=mixclust$G, replace = FALSE) this made it random
-    colors <- b[as.numeric(mix_df$V1)] #for coloring clusters
+    colors <- b[as.numeric(mix_df$class)] #for coloring clusters
     
-    scatterplot3d(mix_df[1:3], pch = 16, color=colors,main="Clusters Encontrados",
-                  col.axis="grey", angle=input$angle) #yay plot
-
+    s3d <- scatterplot3d(mix_df[input$columnas], pch = 16, color=colors,
+                         main="Clusters Encontrados",
+                  col.axis="grey", angle=input$angle,
+                  type="h", lty.hplot=2) #yay plot
+    
+    # Add supplementary points
+    
+    for (i in 1:max(mixclust$G)){
+      tmp<-mixclust$classification==i  
+      #lines(density(mix_df$data[tmp],adjust=2),col=ColourVec[i])
+      #s3d$points3d(mixclust$data[,1], density(mixclust$data[,1],adjust=2),
+      #             col = b[i], type = "l", pch = 8)
+      
+      #s3d$plane3d(density(mix_df$data[tmp],adjust=2), col = b[i], pch = 8,
+      #            type="h", lty.hplot=2)
+      
+    }
+    
   })
-
+  
+  output$density <- renderPlot({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      print(input$columnas)
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    mix<-as.matrix(filedata())
+    # generate the clustering model
+    mixclust = Mclust(mix)           # initialize EM with hierarchical clustering, execute BIC and EM
+    #add classification as a variable, then use as data frame for easy plotting
+    mix<-cbind(mix,mixclust$classification)
+    colnames(mix)[length(colnames(mix))] <- "class"
+    mix_df<-as.data.frame(mix)
+    
+    #partir colors en K (num clusters)
+    a <- rainbow(201)
+    b <- a[seq(1, length(a), 201/mixclust$G)]
+    #colors <- sample(rainbow(201), size=mixclust$G, replace = FALSE) this made it random
+    colors <- b[as.numeric(mix_df$class)] #for coloring clusters
+    
+    dens = densityMclust(mixclust$data)
+    
+    plot(dens, what = "density", type = "persp", col = mixclust$classification)
+  })
+  
+  output$selectMultiple <- renderUI({
+    if (is.null(filedata()))
+      return(NULL)
+      
+    data <- as.matrix(filedata())
+    selectizeInput('columnas', 'Que columnas quieres visualizar', 
+                   choices = colnames(data), multiple = TRUE,
+                   options = list(maxItems = 2))
+  })
+  
 })

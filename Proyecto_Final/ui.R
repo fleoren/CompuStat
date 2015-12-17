@@ -15,6 +15,7 @@ shinyUI(fluidPage(
   # Sidebar... here would go the "choose file" button"
   sidebarLayout(
     sidebarPanel(
+      
       fileInput('file1', 'Elige un archivo',
                 accept = c(
                   'text/csv',
@@ -23,8 +24,8 @@ shinyUI(fluidPage(
                   'text/plain',
                   '.csv',
                   '.tsv'
-                )
-      ),
+                )),
+      
       tags$hr(),
       checkboxInput('header', 'Tiene encabezado', TRUE),
       radioButtons('sep', 'Separator',
@@ -39,13 +40,24 @@ shinyUI(fluidPage(
                    '"'),
       # otra
       
-      sliderInput('angle', 'Angulo del grafico', 0, 360, value=45)
+      sliderInput('angle', 'Angulo del grafico', 0, 360, value=45),
+      tags$hr(),
+
+      #The conditional panel is triggered by the preceding checkbox
+      uiOutput('selectMultiple')
+      
+      # checkboxGroupInput("variable", "Variable:",
+      #    c("Cylinders" = "cyl",
+      #     "Transmission" = "am",
+      #     "Gears" = "gear"))
+      
     ),
     
     mainPanel(
       tabsetPanel(
         tabPanel("Clusters",plotOutput("clustPlot"))
-      )
+      ),
+      plotOutput("density")
     )
     
     # Show a plot of the generated clusters
