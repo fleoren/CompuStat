@@ -1,4 +1,3 @@
-
 # This is the server logic for a Shiny web application.
 # You can find out more about building applications with Shiny here:
 #
@@ -19,21 +18,6 @@ library("scatterplot3d")
 
 shinyServer(function(input, output) {
   
-  #TODO ESTO DEBE SER BORRADO CUANDO FUNCIONE UPLOADFILE
-  #x1 = rnorm(n=20, mean=1, sd=1)   # get 20 normal distributed points for x axis with mean=1 and std=1 (1st class)
-  #y1 = rnorm(n=20, mean=1, sd=1)   # get 20 normal distributed points for x axis with mean=1 and std=1 (1st class)
-  #z1 = rnorm(n=20, mean=1, sd=1)   # get 20 normal distributed points for x axis with mean=1 and std=1 (1st class)
-  #x2 = rnorm(n=20, mean=5, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)
-  #y2 = rnorm(n=20, mean=5, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)
-  #z2 = rnorm(n=20, mean=5, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)
-  #x3 = rnorm(n=20, mean=-2, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)
-  #y3 = rnorm(n=20, mean=-2, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)
-  #z3 = rnorm(n=20, mean=-2, sd=1)   # get 20 normal distributed points for x axis with mean=5 and std=1 (2nd class)
-  #mix = matrix(nrow=60, ncol=3)    # create a dataframe matrix 
-  #mix[,1] = c(x1, x2, x3)              # insert first class points into the matrix
-  #mix[,2] = c(y1, y2, y3)              # insert second class points into the matrix
-  #mix[,3] = c(z1, z2 ,z3)              # insert third class points into the matrix
-  
   filedata <- reactive({
     inFile <- input$file1
     if (is.null(inFile)) {
@@ -44,10 +28,48 @@ shinyServer(function(input, output) {
              sep = input$sep, quote = input$quote)
   })
   
+  output$numclusters <- renderUI({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    mix<-as.matrix(filedata()[input$columnas])
+    mixclust = Mclust(mix)
+    
+    HTML(paste("<span style='font-size: 18px;'>", "Se encontraron ","<strong>",mixclust$G,"</strong>"," clusters.","</span>"))
+  })
+  
+  output$datosclas <- renderUI({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    HTML(paste("<h4 style='text-align:center;'>","Como se ven tus datos","</h4>"))
+  })
+  
+  output$clasificacion <- renderUI({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    HTML(paste("<h4 style='text-align:center;'>","Clasificacion","</h4>"))
+  })
+  
+  output$densidad <- renderUI({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    HTML(paste("<h4 style='text-align:center;'>","Densidad","</h4>"))
+  })
+  
   output$clustPlot <- renderPlot({
     if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
     {
-      print(input$columnas)
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
@@ -66,7 +88,7 @@ shinyServer(function(input, output) {
     colors <- b[as.numeric(mix_df$class)] #for coloring clusters
     
     s3d <- scatterplot3d(mix_df[input$columnas], pch = 16, color=colors,
-                         main="Clusters Encontrados",
+                         #main="Clusters Encontrados",
                   col.axis="grey", angle=input$angle,
                   type="h", lty.hplot=2) #yay plot
     
@@ -75,7 +97,6 @@ shinyServer(function(input, output) {
   output$density <- renderPlot({
     if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
     {
-      print(input$columnas)
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
@@ -87,13 +108,12 @@ shinyServer(function(input, output) {
     b <- a[seq(1, length(a), 201/dens$G)]
     
     #plot(dens, what = "density", type = "persp", col = mixclust$classification)
-    plot(dens, what = "density", data = mix, col=b)
+    plot(dens, what = "density", data = mix, col=b, main = "")
   })
   
   output$classification <- renderPlot({
     if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
     {
-      print(input$columnas)
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
@@ -101,7 +121,7 @@ shinyServer(function(input, output) {
     
     mixclust = Mclust(mix)
     
-    plot(mixclust, what = "classification")
+    plot(mixclust, what = "classification", main = "")
   })
   
   output$selectMultiple <- renderUI({
