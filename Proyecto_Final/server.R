@@ -1,4 +1,3 @@
-
 # This is the server logic for a Shiny web application.
 # You can find out more about building applications with Shiny here:
 #
@@ -29,10 +28,48 @@ shinyServer(function(input, output) {
              sep = input$sep, quote = input$quote)
   })
   
+  output$numclusters <- renderUI({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    mix<-as.matrix(filedata()[input$columnas])
+    mixclust = Mclust(mix)
+    
+    HTML(paste("<span style='font-size: 18px;'>", "Se encontraron ","<strong>",mixclust$G,"</strong>"," clusters.","</span>"))
+  })
+  
+  output$datosclas <- renderUI({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    HTML(paste("<h4 style='text-align:center;'>","Como se ven tus datos","</h4>"))
+  })
+  
+  output$clasificacion <- renderUI({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    HTML(paste("<h4 style='text-align:center;'>","Clasificacion","</h4>"))
+  })
+  
+  output$densidad <- renderUI({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    HTML(paste("<h4 style='text-align:center;'>","Densidad","</h4>"))
+  })
+  
   output$clustPlot <- renderPlot({
     if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
     {
-      print(input$columnas)
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
@@ -50,20 +87,16 @@ shinyServer(function(input, output) {
     #colors <- sample(rainbow(201), size=mixclust$G, replace = FALSE) this made it random
     colors <- b[as.numeric(mix_df$class)] #for coloring clusters
     
-    s3d <- scatterplot3d(mix_df[input$columnas], pch = 16, color=colors,
-                         main="Clusters Encontrados",
+    scatterplot3d(mix_df[input$columnas], pch = 16, color=colors,
+                         #main="Clusters Encontrados",
                   col.axis="grey", angle=input$angle,
                   type="h", lty.hplot=2) #yay plot
     
-    scatterplot3d(x=mix_df[1:3], 
-                  pch = 16, color=colors,main="Clusters Encontrados",
-                  col.axis="grey", angle=input$angle) #yay plot
   })
   
   output$density <- renderPlot({
     if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
     {
-      print(input$columnas)
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
@@ -74,14 +107,12 @@ shinyServer(function(input, output) {
     a <- rainbow(201)
     b <- a[seq(1, length(a), 201/dens$G)]
     
-    #plot(dens, what = "density", type = "persp", col = mixclust$classification)
-    plot(dens, what = "density", data = mix, col=b)
+    plot(dens, what = "density", data = mix, col=b, main = "")
   })
   
   output$classification <- renderPlot({
     if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
     {
-      print(input$columnas)
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
@@ -89,7 +120,7 @@ shinyServer(function(input, output) {
     
     mixclust = Mclust(mix)
     
-    plot(mixclust, what = "classification")
+    plot(mixclust, what = "classification", main = "")
   })
   
   output$selectMultiple <- renderUI({

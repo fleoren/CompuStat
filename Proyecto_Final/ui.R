@@ -40,25 +40,24 @@ shinyUI(fluidPage(
                    '"'),
       # otra
       
-      sliderInput('angle', 'Angulo del grafico', 0, 360, value=45),
+      sliderInput('angle', 'Angulo del grafico 3D', 0, 360, value=45),
       tags$hr(),
 
       #The conditional panel is triggered by the preceding checkbox
       uiOutput('selectMultiple')
       
-      # checkboxGroupInput("variable", "Variable:",
-      #    c("Cylinders" = "cyl",
-      #     "Transmission" = "am",
-      #     "Gears" = "gear"))
-      
     ),
     
     mainPanel(
-      
+      uiOutput("numclusters"),
+      uiOutput("datosclas"),
+      #h3("Datos clasificados"),
       plotOutput("clustPlot"),
-      
+      #h3("Clasificacion"),
+      uiOutput("clasificacion"),
       plotOutput("classification"),
-      
+      #h3("Densidad"),
+      uiOutput("densidad"),
       plotOutput("density")
     )
     
@@ -67,5 +66,6 @@ shinyUI(fluidPage(
     #  tabPanel("Clusters",plotOutput("clustPlot"))
     #tabPanel("Algunas Graficas de Apoyo",plotOutput("bla"))
     #)
+    
   )
 ))
