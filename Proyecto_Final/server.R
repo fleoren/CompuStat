@@ -17,7 +17,7 @@ library(car)
 library("scatterplot3d")
 
 shinyServer(function(input, output) {
-  
+
   filedata <- reactive({
     inFile <- input$file1
     if (is.null(inFile)) {
@@ -87,7 +87,7 @@ shinyServer(function(input, output) {
     #colors <- sample(rainbow(201), size=mixclust$G, replace = FALSE) this made it random
     colors <- b[as.numeric(mix_df$class)] #for coloring clusters
     
-    s3d <- scatterplot3d(mix_df[input$columnas], pch = 16, color=colors,
+    scatterplot3d(mix_df[input$columnas], pch = 16, color=colors,
                          #main="Clusters Encontrados",
                   col.axis="grey", angle=input$angle,
                   type="h", lty.hplot=2) #yay plot
@@ -107,7 +107,6 @@ shinyServer(function(input, output) {
     a <- rainbow(201)
     b <- a[seq(1, length(a), 201/dens$G)]
     
-    #plot(dens, what = "density", type = "persp", col = mixclust$classification)
     plot(dens, what = "density", data = mix, col=b, main = "")
   })
   
