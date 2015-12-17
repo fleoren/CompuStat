@@ -54,9 +54,11 @@ shinyUI(fluidPage(
     ),
     
     mainPanel(
-      tabsetPanel(
-        tabPanel("Clusters",plotOutput("clustPlot"))
-      ),
+      
+      plotOutput("clustPlot"),
+      
+      plotOutput("classification"),
+      
       plotOutput("density")
     )
     
