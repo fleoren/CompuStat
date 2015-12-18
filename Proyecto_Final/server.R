@@ -10,7 +10,7 @@ library(scatterplot3d)
 library(rgl)
 
 shinyServer(function(input, output) {
-
+  
   filedata <- reactive({
     inFile <- input$file1
     if (is.null(inFile)) {
@@ -118,7 +118,7 @@ shinyServer(function(input, output) {
   output$selectMultiple <- renderUI({
     if (is.null(filedata()))
       return(NULL)
-      
+    
     data <- as.matrix(filedata())
     selectizeInput('columnas', 'Que columnas quieres visualizar', 
                    choices = colnames(data), multiple = TRUE,
@@ -225,7 +225,7 @@ shinyServer(function(input, output) {
     
     clusters <- 1:9
     plot(clusters, aic, type="b",
-          lty=1,  pch=1)
+         lty=1,  pch=1)
   })
   
   output$codo <- renderUI({
