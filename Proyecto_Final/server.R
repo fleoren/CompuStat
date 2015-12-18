@@ -11,14 +11,22 @@ library(rgl)
 
 shinyServer(function(input, output) {
   
+  
+  
   filedata <- reactive({
     inFile <- input$file1
     if (is.null(inFile)) {
       # User has not uploaded a file yet
       return(NULL)
     }
-    read.csv(inFile$datapath, header = input$header,
-             sep = input$sep, quote = input$quote)
+    dataset <- read.csv(inFile$datapath, header = input$header,
+             sep = input$sep, quote = input$quote )
+    if(nrow(dataset) * ncol(dataset) > 2500)
+    {
+      index <- sample(1:nrow(dataset), size = nrow(dataset)/2, replace=FALSE)
+      dataset <- dataset[index,]
+    }
+    return(dataset)
   })
   
   output$numclusters <- renderUI({
@@ -27,10 +35,29 @@ shinyServer(function(input, output) {
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
-    mix<-as.matrix(filedata())
+    if(input$pca==TRUE)
+    {
+      pca <- prcomp(filedata(), center=TRUE, scale=TRUE)
+      mix <- as.data.frame(pca$x[,1:3])
+    }
+    else
+    {
+      mix<-as.matrix(filedata())
+    }
+    
     mixclust = Mclust(mix)
     
-    HTML(paste("<span style='font-size: 18px;'>", "Se encontraron ","<strong>",mixclust$G,"</strong>"," clusters.","</span>"))
+    if(input$pca==TRUE)
+    {
+      suma_pca <- round(sum(pca$sdev[1:3])/sum(pca$sdev) * 100,2)
+      etiqueta_pca <- paste("Las primeras 3 componentes explican el ", suma_pca, "% de la varianza.")
+      HTML(paste("<span style='font-size: 18px;'>", "Se encontraron ","<strong>",mixclust$G,"</strong>"," clusters.","</span><br /><span>", etiqueta_pca,"</span>"))
+    }
+    else
+    {
+      HTML(paste("<span style='font-size: 18px;'>", "Se encontraron ","<strong>",mixclust$G,"</strong>"," clusters.","</span>"))
+    }
+    
   })
   
   output$datosclas <- renderUI({
@@ -66,7 +93,16 @@ shinyServer(function(input, output) {
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
-    mix<-as.matrix(filedata()[input$columnas])
+    if(input$pca==TRUE)
+    {
+      mix <- prcomp(filedata(), center=TRUE, scale=TRUE)
+      mix <- as.data.frame(mix$x[,1:3])
+    }
+    else
+    {
+      mix<-as.matrix(filedata())
+    }
+    
     # generate the clustering model
     mixclust = Mclust(mix)           # initialize EM with hierarchical clustering, execute BIC and EM
     #add classification as a variable, then use as data frame for easy plotting
@@ -80,10 +116,20 @@ shinyServer(function(input, output) {
     #colors <- sample(rainbow(201), size=mixclust$G, replace = FALSE) this made it random
     colors <- b[as.numeric(mix_df$class)] #for coloring clusters
     
-    scatterplot3d(mix_df[input$columnas], pch = 16, color=colors,
+    if(input$pca==TRUE)
+    {
+    scatterplot3d(mix_df, pch = 16, color=colors,
                   #main="Clusters Encontrados",
                   col.axis="grey", angle=input$angle,
                   type="h", lty.hplot=2) #yay plot
+    }
+    else
+    {
+      scatterplot3d(mix_df[input$columnas], pch = 16, color=colors,
+                    #main="Clusters Encontrados",
+                    col.axis="grey", angle=input$angle,
+                    type="h", lty.hplot=2) #yay plot
+    }
   })
   
   output$density <- renderPlot({
@@ -92,7 +138,15 @@ shinyServer(function(input, output) {
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
-    mix<-filedata()[input$columnas]
+    if(input$pca==TRUE)
+    {
+      mix <- prcomp(filedata(), center=TRUE, scale=TRUE)
+      mix <- as.data.frame(mix$x[,1:3])
+    }
+    else
+    {
+      mix<-as.matrix(filedata())
+    }
     
     dens = densityMclust(mix)
     
@@ -108,7 +162,15 @@ shinyServer(function(input, output) {
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
-    mix<-filedata()[input$columnas]
+    if(input$pca==TRUE)
+    {
+      mix <- prcomp(filedata(), center=TRUE, scale=TRUE)
+      mix <- as.data.frame(mix$x[,1:3])
+    }
+    else
+    {
+      mix<-as.matrix(filedata())
+    }
     
     mixclust = Mclust(mix)
     
@@ -119,9 +181,18 @@ shinyServer(function(input, output) {
     if (is.null(filedata()))
       return(NULL)
     
-    data <- as.matrix(filedata())
+    if(input$pca==TRUE)
+    {
+      mix <- prcomp(filedata(), center=TRUE, scale=TRUE)
+      mix <- as.data.frame(mix$x[,1:3])
+    }
+    else
+    {
+      mix<-as.matrix(filedata())
+    }
+    
     selectizeInput('columnas', 'Que columnas quieres visualizar', 
-                   choices = colnames(data), multiple = TRUE,
+                   choices = colnames(mix), multiple = TRUE,
                    options = list(maxItems = 3))
   })
   
@@ -131,7 +202,16 @@ shinyServer(function(input, output) {
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
-    mix<-filedata()[input$columnas]
+    if(input$pca==TRUE)
+    {
+      mix <- prcomp(filedata(), center=TRUE, scale=TRUE)
+      mix <- as.data.frame(mix$x[,1:3])
+    }
+    else
+    {
+      mix<-as.matrix(filedata())
+    }
+    
     BIC = mclustBIC(mix)
     plot(BIC)
   })
@@ -145,7 +225,15 @@ shinyServer(function(input, output) {
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
-    mix<-filedata()[input$columnas]
+    if(input$pca==TRUE)
+    {
+      pca <- prcomp(filedata(), center=TRUE, scale=TRUE)
+      mix <- as.matrix(pca$x[,1:3])
+    }
+    else
+    {
+      mix<-as.matrix(filedata())
+    }
     
     minimizar <- seq(1,9)
     for(i in 1:9)
@@ -172,10 +260,20 @@ shinyServer(function(input, output) {
     #colors <- sample(rainbow(201), size=mixclust$G, replace = FALSE) this made it random
     colors <- b[as.numeric(mix$fit.cluster)] #for coloring clusters
     
-    scatterplot3d(mix[input$columnas], pch = 16, color=colors,
-                  #main="Clusters Encontrados",
-                  col.axis="grey", angle=input$angle,
-                  type="h", lty.hplot=2) #yay plot
+    if(input$pca==TRUE)
+    {
+      scatterplot3d(mix, pch = 16, color=colors,
+                    #main="Clusters Encontrados",
+                    col.axis="grey", angle=input$angle,
+                    type="h", lty.hplot=2) #yay plot
+    }
+    else
+    {
+      scatterplot3d(mix[input$columnas], pch = 16, color=colors,
+                    #main="Clusters Encontrados",
+                    col.axis="grey", angle=input$angle,
+                    type="h", lty.hplot=2) #yay plot
+    }
   })
   
   output$numclusterskmeans <- renderUI({
@@ -184,7 +282,15 @@ shinyServer(function(input, output) {
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
-    mix<-filedata()[input$columnas]
+    if(input$pca==TRUE)
+    {
+      pca <- prcomp(filedata(), center=TRUE, scale=TRUE)
+      mix <- as.matrix(pca$x[,1:3])
+    }
+    else
+    {
+      mix<-as.matrix(filedata())
+    }
     
     minimizar <- seq(1,9)
     for(i in 1:9)
@@ -193,6 +299,7 @@ shinyServer(function(input, output) {
       fit <- kmeans(mix, i) # 5 cluster solution
       
       rss <- sum(fit$withinss)
+      
       aic <- nrow(mix)/3*i + nrow(mix)*log(rss/nrow(mix))
       
       minimizar[i] <- aic
@@ -200,7 +307,17 @@ shinyServer(function(input, output) {
     
     optimo <- which.min(minimizar)
     
-    HTML(paste("<span style='font-size: 18px;'>", "Se encontraron ","<strong>", optimo,"</strong>"," clusters.","</span>"))
+    if(input$pca==TRUE)
+    {
+      suma_pca <- round(sum(pca$sdev[1:3])/sum(pca$sdev) * 100,2)
+      etiqueta_pca <- paste("Las primeras 3 componentes explican el ", suma_pca, "% de la varianza.")
+      HTML(paste("<span style='font-size: 18px;'>", "Se encontraron ","<strong>", optimo,"</strong>"," clusters.","</span><br /><span>", etiqueta_pca,"</span>"))
+    }
+    else
+    {
+      HTML(paste("<span style='font-size: 18px;'>", "Se encontraron ","<strong>", optimo,"</strong>"," clusters.","</span>"))
+    }
+    
   })
   
   output$codokmeans <- renderPlot({
@@ -209,7 +326,15 @@ shinyServer(function(input, output) {
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
-    mix<-filedata()[input$columnas]
+    if(input$pca==TRUE)
+    {
+      pca <- prcomp(filedata(), center=TRUE, scale=TRUE)
+      mix <- as.matrix(pca$x[,1:3])
+    }
+    else
+    {
+      mix<-as.matrix(filedata())
+    }
     
     aic <- seq(1,9)
     for(i in 1:9)

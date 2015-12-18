@@ -41,6 +41,8 @@ shinyUI(fluidPage(
       sliderInput('angle', 'Angulo del grafico 3D', 0, 360, value=45),
       tags$hr(),
       
+      checkboxInput('pca', 'Reducir dimensionalidad con PCA', TRUE),
+
       uiOutput('selectMultiple')
       
     ),
