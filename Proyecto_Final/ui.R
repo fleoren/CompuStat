@@ -41,7 +41,7 @@ shinyUI(fluidPage(
       sliderInput('angle', 'Angulo del grafico 3D', 0, 360, value=45),
       tags$hr(),
       
-      checkboxInput('pca', 'PCA', FALSE),
+      checkboxInput('pca', 'Reducir dimensionalidad con PCA', TRUE),
 
       uiOutput('selectMultiple')
       
@@ -51,14 +51,14 @@ shinyUI(fluidPage(
       
       tabsetPanel(
         tabPanel("EM + BIC",
-          uiOutput("numclusters"),
-          uiOutput("datosclas"),
-          plotOutput("clustPlot"),
-          uiOutput("clasificacion"),
-          plotOutput("classification"),
-          uiOutput("densidad"),
-          plotOutput("density"),
-          plotOutput("bic")),
+                 uiOutput("numclusters"),
+                 uiOutput("datosclas"),
+                 plotOutput("clustPlot"),
+                 uiOutput("clasificacion"),
+                 plotOutput("classification"),
+                 uiOutput("densidad"),
+                 plotOutput("density"),
+                 plotOutput("bic")),
         tabPanel("kmeans + AIC",
                  uiOutput("numclusterskmeans"),
                  uiOutput("datosclaskmeans"),
