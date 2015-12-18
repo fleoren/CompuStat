@@ -46,9 +46,10 @@ shinyUI(fluidPage(
     ),
     
     mainPanel(
-      uiOutput("numclusters"),
+      
       tabsetPanel(
         tabPanel("EM + BIC",
+          uiOutput("numclusters"),
           uiOutput("datosclas"),
           plotOutput("clustPlot"),
           uiOutput("clasificacion"),
@@ -56,9 +57,12 @@ shinyUI(fluidPage(
           uiOutput("densidad"),
           plotOutput("density"),
           plotOutput("bic")),
-        tabPanel("kmeans + penalizacion",
+        tabPanel("kmeans + AIC",
+                 uiOutput("numclusterskmeans"),
+                 uiOutput("datosclaskmeans"),
                  plotOutput("datoskmeans"),
-                 plotOutput("clusterskmeans"))
+                 uiOutput("codo"),
+                 plotOutput("codokmeans"))
       )
     )
     

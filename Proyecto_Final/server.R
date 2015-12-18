@@ -153,10 +153,10 @@ shinyServer(function(input, output) {
       # K-Means Cluster Analysis
       fit <- kmeans(mix, i) # 5 cluster solution
       
-      aic <- 2*i + nrow(mix)*log(fit$totss/nrow(mix))
+      rss <- sum(fit$withinss)
+      aic <- nrow(mix)/3*i + nrow(mix)*log(rss/nrow(mix))
       
       minimizar[i] <- aic
-      
     }
     
     optimo <- which.min(minimizar)
@@ -177,5 +177,74 @@ shinyServer(function(input, output) {
                   col.axis="grey", angle=input$angle,
                   type="h", lty.hplot=2) #yay plot
   })
+  
+  output$numclusterskmeans <- renderUI({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    mix<-filedata()[input$columnas]
+    
+    minimizar <- seq(1,9)
+    for(i in 1:9)
+    {
+      # K-Means Cluster Analysis
+      fit <- kmeans(mix, i) # 5 cluster solution
+      
+      rss <- sum(fit$withinss)
+      aic <- nrow(mix)/3*i + nrow(mix)*log(rss/nrow(mix))
+      
+      minimizar[i] <- aic
+    }
+    
+    optimo <- which.min(minimizar)
+    
+    HTML(paste("<span style='font-size: 18px;'>", "Se encontraron ","<strong>", optimo,"</strong>"," clusters.","</span>"))
+  })
+  
+  output$codokmeans <- renderPlot({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    mix<-filedata()[input$columnas]
+    
+    aic <- seq(1,9)
+    for(i in 1:9)
+    {
+      # K-Means Cluster Analysis
+      fit <- kmeans(mix, i) # 5 cluster solution
+      
+      rss <- sum(fit$withinss)
+      temp <- nrow(mix)/3*i + nrow(mix)*log(rss/nrow(mix))
+      
+      aic[i] <- temp
+    }
+    
+    clusters <- 1:9
+    plot(clusters, aic, type="b",
+          lty=1,  pch=1)
+  })
+  
+  output$codo <- renderUI({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    HTML(paste("<h4 style='text-align:center;'>","Numero de clusters","</h4>"))
+  })
+  
+  output$datosclaskmeans <- renderUI({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    HTML(paste("<h4 style='text-align:center;'>","Como se ven tus datos","</h4>"))
+  })
+  
   
 })
