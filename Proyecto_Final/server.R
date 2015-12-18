@@ -5,16 +5,9 @@
 #
 
 library(shiny)
-#install.packages('mclust')
-library(mclust)      
-#install.packages("devtools")
-library("devtools")
-#install_github(repo = "bryanhanson/ChemoSpec@master")
-library("ChemoSpec")
-#install.packages("car")
-library(car)
-#install.packages("scatterplot3d")
-library("scatterplot3d")
+library(mclust)
+library(scatterplot3d)
+library(rgl)
 
 shinyServer(function(input, output) {
 
@@ -88,10 +81,9 @@ shinyServer(function(input, output) {
     colors <- b[as.numeric(mix_df$class)] #for coloring clusters
     
     scatterplot3d(mix_df[input$columnas], pch = 16, color=colors,
-                         #main="Clusters Encontrados",
+                  #main="Clusters Encontrados",
                   col.axis="grey", angle=input$angle,
                   type="h", lty.hplot=2) #yay plot
-    
   })
   
   output$density <- renderPlot({
@@ -131,6 +123,59 @@ shinyServer(function(input, output) {
     selectizeInput('columnas', 'Que columnas quieres visualizar', 
                    choices = colnames(data), multiple = TRUE,
                    options = list(maxItems = 3))
+  })
+  
+  output$bic <- renderPlot({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    mix<-filedata()[input$columnas]
+    BIC = mclustBIC(mix)
+    plot(BIC)
+  })
+  
+  
+  
+  ############ kmeans
+  output$datoskmeans <- renderPlot({
+    if (is.null(filedata()) || is.null(input$columnas) || length(input$columnas) < 2)
+    {
+      return(NULL) # si no han seleccionado archivo no hacer nada
+    }
+    
+    mix<-filedata()[input$columnas]
+    
+    minimizar <- seq(1,9)
+    for(i in 1:9)
+    {
+      # K-Means Cluster Analysis
+      fit <- kmeans(mix, i) # 5 cluster solution
+      
+      aic <- 2*i + nrow(mix)*log(fit$totss/nrow(mix))
+      
+      minimizar[i] <- aic
+      
+    }
+    
+    optimo <- which.min(minimizar)
+    fit <- kmeans(mix, optimo)
+    # get cluster means 
+    aggregate(mix,by=list(fit$cluster),FUN=mean)
+    # append cluster assignment
+    mix <- data.frame(mix, fit$cluster)
+    
+    #partir colors en K (num clusters)
+    a <- rainbow(201)
+    b <- a[seq(1, length(a), 201/optimo)]
+    #colors <- sample(rainbow(201), size=mixclust$G, replace = FALSE) this made it random
+    colors <- b[as.numeric(mix$fit.cluster)] #for coloring clusters
+    
+    scatterplot3d(mix[input$columnas], pch = 16, color=colors,
+                  #main="Clusters Encontrados",
+                  col.axis="grey", angle=input$angle,
+                  type="h", lty.hplot=2) #yay plot
   })
   
 })

@@ -10,12 +10,11 @@ library(shiny)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("Dejanos Adivinar Cuantos Clusters Tienen tus Datos"),
+  titlePanel("Dejanos adivinar cuantos clusters tienen tus datos"),
   
   # Sidebar... here would go the "choose file" button"
   sidebarLayout(
     sidebarPanel(
-      
       fileInput('file1', 'Elige un archivo',
                 accept = c(
                   'text/csv',
@@ -34,32 +33,35 @@ shinyUI(fluidPage(
                      Tab='\t'),
                    ','),
       radioButtons('quote', 'Encomillado',
-                   c(None='',
+                   c('Ninguno'='',
                      'Doble'='"',
                      'Simple'="'"),
                    '"'),
-      # otra
       
       sliderInput('angle', 'Angulo del grafico 3D', 0, 360, value=45),
       tags$hr(),
 
-      #The conditional panel is triggered by the preceding checkbox
       uiOutput('selectMultiple')
       
     ),
     
     mainPanel(
       uiOutput("numclusters"),
-      uiOutput("datosclas"),
-      #h3("Datos clasificados"),
-      plotOutput("clustPlot"),
-      #h3("Clasificacion"),
-      uiOutput("clasificacion"),
-      plotOutput("classification"),
-      #h3("Densidad"),
-      uiOutput("densidad"),
-      plotOutput("density")
+      tabsetPanel(
+        tabPanel("EM + BIC",
+          uiOutput("datosclas"),
+          plotOutput("clustPlot"),
+          uiOutput("clasificacion"),
+          plotOutput("classification"),
+          uiOutput("densidad"),
+          plotOutput("density"),
+          plotOutput("bic")),
+        tabPanel("kmeans + penalizacion",
+                 plotOutput("datoskmeans"),
+                 plotOutput("clusterskmeans"))
+      )
     )
+    
     
     # Show a plot of the generated clusters
     #tabsetPanel(
