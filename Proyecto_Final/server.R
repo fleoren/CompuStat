@@ -27,7 +27,7 @@ shinyServer(function(input, output) {
       return(NULL) # si no han seleccionado archivo no hacer nada
     }
     
-    mix<-as.matrix(filedata()[input$columnas])
+    mix<-as.matrix(filedata())
     mixclust = Mclust(mix)
     
     HTML(paste("<span style='font-size: 18px;'>", "Se encontraron ","<strong>",mixclust$G,"</strong>"," clusters.","</span>"))

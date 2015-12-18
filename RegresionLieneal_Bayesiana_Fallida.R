@@ -123,7 +123,7 @@ sourceCpp("BayesianMH.cpp")
 
 nsim <- 1000
 init <- c(3, 1)
-MHBayes(20, init, objdens, proposal, data)
+MHBayes(20, init, objdens, proposal,data)
 mh.samp <- MHBayes(nsim, init, objdens, proposal, data)
 estims <- mh.samp$theta
 
