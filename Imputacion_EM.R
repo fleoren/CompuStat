@@ -4,6 +4,8 @@ library(foreign)
 library(mvtnorm)
 library(e1071)
 
+#hola
+
 table <- read.dta("datos_politicos.dta") # LEEMOS LOS DATOS DE FORMATO STATA
 ano <- 1986 # POR EL MOMENTO ESCOJAMOS UN SOLO A?O PUES NO SABEMOS NADA DE DATOS PANEL
 data <- table[table$year==ano, ]
